@@ -1,0 +1,29 @@
+services:
+  web: # act as an INGRESS and as a Service
+    image: nginx:alpine
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+      - 443:443
+  odoo:
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - ./configs/odoo.conf:/etc/odoo/odoo.conf
+    ports:
+      - 8069:8069
+    environment:
+      HOST: database
+      PORT: 5432
+      USER: odoo
+      PASSWORD: odoo
+
+  database:
+    image: postgres:17
+    ports:
+      - 5432
+    environment:
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_USER: odoo
+      POSTGRES_DB: postgres

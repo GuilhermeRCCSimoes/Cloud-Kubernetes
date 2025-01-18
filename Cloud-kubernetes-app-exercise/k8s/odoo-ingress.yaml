@@ -1,0 +1,39 @@
+Steps to Add HTTP/HTTPS Support
+
+    Ingress Configuration:
+        The odoo-ingress.yaml file in your k8s/ folder is responsible for configuring HTTP and HTTPS access.
+
+    TLS (HTTPS) Certificates:
+        You will need to generate or provide a TLS certificate for HTTPS support.
+        If you're working locally, use a self-signed certificate, or use tools like Cert-Manager or Let's Encrypt for automatic certificate management.
+
+    DNS or /etc/hosts:
+        For local testing, add an entry in your /etc/hosts file to map the domain (e.g., odoo.local) to your Minikube IP address.
+
+Updated Ingress File (odoo-ingress.yaml)
+
+This YAML file sets up both HTTP and HTTPS for your Odoo application:
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: odoo-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  rules:
+  - host: odoo.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: odoo-service
+            port:
+              number: 8069
+  tls:
+  - hosts:
+    - odoo.local
+    secretName: odoo-tls
